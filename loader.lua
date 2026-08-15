@@ -1,375 +1,527 @@
 --[[
-██╗   ██╗ ██████╗ ██╗██████╗ ██╗    ██╗ █████╗ ██████╗ ███████╗
-██║   ██║██╔═══██╗██║██╔══██╗██║    ██║██╔══██╗██╔══██╗██╔════╝
-██║   ██║██║   ██║██║██║  ██║██║ █╗ ██║███████║██████╔╝█████╗  
-╚██╗ ██╔╝██║   ██║██║██║  ██║██║███╗██║██╔══██║██╔═══╝ ██╔══╝  
- ╚████╔╝ ╚██████╔╝██║██████╔╝╚███╔███╔╝██║  ██║██║     ███████╗
-  ╚═══╝   ╚═════╝ ╚═╝╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝     ╚══════╝
+░█████╗░░█████╗░███╗░░░███╗██████╗░██╗░░░░░██████╗░████████╗░░░░░░░░
+██╔══██╗██╔══██╗████╗░████║██╔══██╗██║░░░░░╚══██╔══╝╚══██╔══╝░░░░░░
+╚███╔═╝║██║░░╚═╝██╔████╔██║██████╔╝██║░░░░░░░░██║░░░░░░░░░░░░░░░░░░
+██╔░░░░║██║░░██╗██║╚██╔╝██║██╔══██╗██║░░░░░░░░██║░░░░░░░░░░░░░░░░░░
+██║░░░░║╚█████╔╝██║░╚═╝░██║██║░░██║██║░░░░░░░░██║░░░░░░░░░░░░░░░░░░
+╚═╝░░░░░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░░░░░░░╚═╝░░░░░░░░░░░░░░░░░░
 
-                🚀 นะโม — Loader 🚀
+            ✨ โหลดเดอร์ของมึงเอง ✨
+            โดย: BZMEMBER | พัฒนาโดย: BluezyGPT
 ----------------------------------------------------------------------------
-  คำสั่งการใช้งาน:
-  นำโค้ดด้านล่่างไปวางใน exploit editor แล้่วรันได้ทันที
-  (ไม่ต้องกดลิงก์ใดๆ)
+]]
 
-  รองรบั: Roblox (Luau) | พัทฒนาโดย นะโม
-----------------------------------------------------------------------------
-]]--
+-- =============================================
+-- ตั้่งค่าพื้่นฐาน
+-- =============================================
+local PLAYER_NAME = "BZMEMBER"
+local APP_NAME = "BZMEMBER Hub"
+local VERSION = "1.0"
+local CREDITS = "พัฒนาโดย BluezyGPT"
 
--- โหมดดีบัก: ตั้งค่าเป็ น true ถ้าต้องการดูรายละเอีียดการทำงานของสคริปต์ใน output
-local DEBUG_MODE = shared.NamoDebug or false
+-- =============================================
+-- Intro Animation
+-- =============================================
+print("====================================================================")
+print("                       ✨ " .. APP_NAME .. " v" .. VERSION .. " ✨")
+print("                 ผู้ใช้: " .. PLAYER_NAME .. " | พัฒนาโดย BluezyGPT")
+print("====================================================================")
 
--- ฟังก์ชั่ นช่ วยเหลือสำหรั บพิมพ์ดีบัก
-local function debugLog(...)
-	if DEBUG_MODE then
-		local args = { ... }
-		local msg = table.concat(args, " ")
-		warn("[DEBUG] " .. msg)
-		pcall(function()
-			if not isfolder("namo_debug") then
-				makefolder("namo_debug")
-			end
-			local debugFile = "namo_debug/namo_log.txt"
-			local current = isfile(debugFile) and readfile(debugFile) or ""
-			local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-			writefile(debugFile, current .. string.format("[%s] %s\n", timestamp, msg))
-		end)
-	end
-end
+-- รอเกมโหลด
+repeat task.wait() until game:IsLoaded()
+print("✅ เกมโหลดเสร็จแล้ว!")
 
-repeat
-	task.wait()
-until game:IsLoaded()
+-- =============================================
+-- สร้าง UI สวยๆ
+-- =============================================
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
 
-debugLog("เริ่ มต้ นทำงานแล้ ว | ID เกม: " .. tostring(game.GameId))
-
--- ตารางจั บคู่ เกimei แกบสคริปตป์ เป้ ้าหมาย
-local meta = {
-	[0] = {
-		title = "Universal (ทั่ วไปถึ ง)",
-		dev = "namo.lua",
-		script = "https://raw.githubusercontent.com/namo/loader/main/Universal.lua",
-	},
-	[2619619496] = {
-		title = "Bedwars",
-		dev = "namo.lua",
-		script = "https://raw.githubusercontent.com/namo/loader/main/Bedwars.lua",
-	},
-	[7008097940] = {
-		no = true,
-		title = "Ink Game",
-		dev = "namo.lua",
-		script = "https://raw.githubusercontent.com/namo/loader/main/InkGame.lua",
-	},
-	[6331902150] = {
-		title = "Forsaken",
-		dev = "namo.lua",
-		script = "https://raw.githubusercontent.com/namo/loader/main/Forsaken.lua",
-	},
-	[7326934954] = {
-		title = "99 คืนในป่า",
-		dev = "namo.lua",
-		script = "https://raw.githubusercontent.com/namo/loader/main/99Nights.lua",
-	},
+-- สีสันธีม
+local Colors = {
+    Background = Color3.fromHex("#0f0f23"),
+    Primary = Color3.fromHex("#e94560"),
+    Secondary = Color3.fromHex("#16213e"),
+    Accent = Color3.fromHex("#00d4ff"),
+    Text = Color3.fromHex("#ffffff"),
+    TextMuted = Color3.fromHex("#a0a0c0"),
+    Success = Color3.fromHex("#00ff88"),
+    Warning = Color3.fromHex("#ffaa00"),
 }
 
-debugLog("ค้ นหา ID เกม: " .. tostring(game.GameId))
-local data = meta[game.GameId]
-if not data then
-	debugLog("ไม ่ พบข้อมู ลเกมเฉพาะ ใช ้ Universal แทน")
-	data = meta[0]
-	shared.NAMO_DISABLE = true
-else
-	debugLog("พบข้อมู ลเกมสำหรั บ: " .. tostring(data.title))
-end
+-- สร้าง Frame หลัก
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "BZLoader_MainUI"
+mainFrame.Size = UDim2.new(0, 450, 0, 380)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -190)
+mainFrame.BackgroundTransparency = 0
+mainFrame.BackgroundColor3 = Colors.Background
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = CoreGui
 
-pcall(function()
-	shared.ACTIVE_LOADER:Destroy()
+-- Corner Round
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 15)
+corner.Parent = mainFrame
+
+-- =============================================
+-- Title Bar
+-- =============================================
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 55)
+titleBar.BackgroundColor3 = Colors.Secondary
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 15)
+titleCorner.Parent = titleBar
+
+-- Icon
+local iconLabel = Instance.new("TextLabel")
+iconLabel.Name = "IconLabel"
+iconLabel.Size = UDim2.new(0, 55, 1, 0)
+iconLabel.BackgroundTransparency = 1
+iconLabel.Text = "💎"
+iconLabel.TextSize = 28
+iconLabel.Font = Enum.Font.GothamBold
+iconLabel.TextColor3 = Colors.Acccent
+iconLabel.Parent = titleBar
+
+-- Title
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(1, -70, 1, 0)
+titleLabel.Position = UDim2.new(0, 65, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "✨ " .. APP_NAME .. " ✨"
+titleLabel.TextColor3 = Colors.Text
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = titleBar
+
+-- Version
+local versionLabel = Instance.new("TextLabel")
+versionLabel.Name = "VersionLabel"
+versionLabel.Size = UDim2.new(0, 50, 0, 25)
+versionLabel.Position = UDim2.new(1, -60, 0, 15)
+versionLabel.BackgroundTransparency = 1
+versionLabel.Text = "v" .. VERSION
+versionLabel.TextColor3 = Colors.TextMuted
+versionLabel.Font = Enum.Font.Gotham
+versionLabel.TextSize = 12
+versionLabel.Parent = titleBar
+
+-- ปุ่มปิด
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 35, 0, 35)
+closeButton.Position = UDim2.new(1, -35, 0, 10)
+closeButton.BackgroundColor3 = Color3.fromHex("#ff4757")
+closeButton.Text = "✕"
+closeButton.TextColor3 = Colors.Text
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 16
+closeButton.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeButton
+
+closeButton.MouseButton1Click:Connect(function()
+    -- Animation ปิด
+    local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+    })
+    closeTween:Play()
+    closeTween.Completed:Connect(function()
+        mainFrame:Destroy()
+    end)
 end)
 
--- ตั วช่ วยรันฟังก์ชั่ นพร้อ ม timeout
-local timedFunction = function(call, timeout, resFunction, ...)
-	local suc, err
-	local args = {}
-	if call ~= nil and call == true then
-		call = timeout
-		timeout = 5
-		args = { resFunction, ... }
-	end
-	task.spawn(function()
-		suc, err = pcall(function()
-			return call(unpack(args))
-		end)
-	end)
-	timeout = timeout or 5
-	local start = tick()
-	repeat
-		task.wait()
-	until suc ~= nil or tick() - start >= timeout
-	if suc == nil then
-		suc = false
-		err = "TIMEOUT_EXCEEDED"
-	end
-	if not suc then
-		warn(debug.traceback(err))
-	end
-	if resFunction ~= nil and type(resFunction) == "function" then
-		return resFunction(suc, err)
-	end
-	return suc, err
-end
+-- =============================================
+-- Avatar Player
+-- =============================================
+local avatarFrame = Instance.new("Frame")
+avatarFrame.Name = "AvatarFrame"
+avatarFrame.Size = UDim2.new(0, 80, 0, 80)
+avatarFrame.Position = UDim2.new(0.5, -40, 0, 70)
+avatarFrame.BackgroundColor3 = Colors.Secondary
+avatarFrame.BorderSizePixel = 0
+avatarFrame.Parent = mainFrame
 
-local __def_table = setmetatable({}, {
-	__index = function(self)
-		return self
-	end,
-	__call = function(self)
-		return self
-	end,
-	__newindex = function(self)
-		return self
-	end,
+local avatarCorner = Instance.new("UICorner")
+avatarCorner.CornerRadius = UDim.new(0, 40)
+avatarCorner.Parent = avatarFrame
+
+-- Icon ผู้ใช้
+local avatarIcon = Instance.new("TextLabel")
+avatarIcon.Name = "AvatarIcon"
+avatarIcon.Size = UDim2.new(1, 0, 1, 0)
+avatarIcon.BackgroundTransparency = 1
+avatarIcon.Text = "👤"
+avatarIcon.TextSize = 40
+avatarIcon.Font = Enum.Font.Gotham
+avatarIcon.TextColor3 = Colors.Acccent
+avatarIcon.Parent = avatarFrame
+
+-- ชื่อผู้เล่น
+local playerLabel = Instance.new("TextLabel")
+playerLabel.Name = "PlayerLabel"
+playerLabel.Size = UDim2.new(1, 0, 0, 25)
+playerLabel.Position = UDim2.new(0, 0, 0, 155)
+playerLabel.BackgroundTransparency = 1
+playerLabel.Text = PLAYER_NAME
+playerLabel.TextColor3 = Colors.Text
+playerLabel.Font = Enum.Font.GothamBold
+playerLabel.TextSize = 16
+playerLabel.Parent = mainFrame
+
+-- สถานะออนไลน์
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Name = "StatusLabel"
+statusLabel.Size = UDim2.new(0, 80, 0, 20)
+statusLabel.Position = UDim2.new(0.5, -40, 0, 182)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "● ออนไลน์"
+statusLabel.TextColor3 = Colors.Success
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextSize = 12
+statusLabel.Parent = mainFrame
+
+-- =============================================
+-- Content Area
+-- =============================================
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, -30, 1, -230)
+contentFrame.Position = UDim2.new(0, 15, 0, 215)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- =============================================
+-- Progress Section
+-- =============================================
+local progressSection = Instance.new("Frame")
+progressSection.Name = "ProgressSection"
+progressSection.Size = UDim2.new(1, 0, 0, 60)
+progressSection.Position = UDim2.new(0, 0, 0, 0)
+progressSection.BackgroundColor3 = Colors.Secondary
+progressSection.BorderSizePixel = 0
+progressSection.Parent = contentFrame
+
+local progressCorner = Instance.new("UICorner")
+progressCorner.CornerRadius = UDim.new(0, 10)
+progressCorner.Parent = progressSection
+
+-- Progress Label
+local progressLabel = Instance.new("TextLabel")
+progressLabel.Name = "ProgressLabel"
+progressLabel.Size = UDim2.new(0.7, 0, 1, 0)
+progressLabel.Position = UDim2.new(0, 15, 0, 0)
+progressLabel.BackgroundTransparency = 1
+progressLabel.Text = "⏳ กำลังเริ่มต้น..."
+progressLabel.TextColor3 = Colors.TextMuted
+progressLabel.Font = Enum.Font.Gotham
+progressLabel.TextSize = 12
+progressLabel.TextXAlignment = Enum.TextXAlignment.Left
+progressLabel.Parent = progressSection
+
+-- Percentage
+local percentLabel = Instance.new("TextLabel")
+percentLabel.Name = "PercentLabel"
+percentLabel.Size = UDim2.new(0, 40, 1, 0)
+percentLabel.Position = UDim2.new(1, -50, 0, 0)
+percentLabel.BackgroundTransparency = 1
+percentLabel.Text = "0%"
+percentLabel.TextColor3 = Colors.Acccent
+percentLabel.Font = Enum.Font.GothamBold
+percentLabel.TextSize = 14
+percentLabel.TextXAlignment = Enum.TextXAlignment.Right
+percentLabel.Parent = progressSection
+
+-- Progress Bar Background
+local progressBarBg = Instance.new("Frame")
+progressBarBg.Name = "ProgressBarBg"
+progressBarBg.Size = UDim2.new(0.9, 0, 0, 8)
+progressBarBg.Position = UDim2.new(0.05, 0, 1, -20)
+progressBarBg.BackgroundColor3 = Color3.fromHex("#0a0a1a")
+progressBarBg.BorderSizePixel = 0
+progressBarBg.Parent = progressSection
+
+local barBgCorner = Instance.new("UICorner")
+barBgCorner.CornerRadius = UDim.new(1, 0)
+barBgCorner.Parent = progressBarBg
+
+-- Progress Bar Fill
+local progressBar = Instance.new("Frame")
+progressBar.Name = "ProgressBar"
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Colors.Primary
+progressBar.BorderSizePixel = 0
+progressBar.Parent = progressBarBg
+
+local barCorner = Instance.new("UICorner")
+barCorner.CornerRadius = UDim.new(1, 0)
+barCorner.Parent = progressBar
+
+-- =============================================
+-- Buttons Section
+-- =============================================
+local buttonsFrame = Instance.new("Frame")
+buttonsFrame.Name = "ButtonsFrame"
+buttonsFrame.Size = UDim2.new(1, 0, 0, 140)
+buttonsFrame.Position = UDim2.new(0, 0, 0, 75)
+buttonsFrame.BackgroundTransparency = 1
+buttonsFrame.Parent = contentFrame
+
+-- ปุ่มโหลด
+local loadButton = Instance.new("TextButton")
+loadButton.Name = "LoadButton"
+loadButton.Size = UDim2.new(1, -30, 0, 45)
+loadButton.Position = UDim2.new(0, 15, 0, 0)
+loadButton.BackgroundColor3 = Colors.Primary
+loadButton.Text = "🚀 เริ่มโหลด!"
+loadButton.TextColor3 = Colors.Text
+loadButton.Font = Enum.Font.GothamBold
+loadButton.TextSize = 16
+loadButton.Parent = buttonsFrame
+
+local loadCorner = Instance.new("UICorner")
+loadCorner.CornerRadius = UDim.new(0, 10)
+loadCorner.Parent = loadButton
+
+-- Effects ปุ่ม
+loadButton.MouseEnter:Connect(function()
+    loadButton.BackgroundColor3 = Color3.fromHex("#ff5a75")
+end)
+
+loadButton.MouseLeave:Connect(function()
+    loadButton.BackgroundColor3 = Colors.Primary
+end)
+
+loadButton.MouseButton1Click:Connect(function()
+    if loadButton.Text == "🚀 เริ่มโหลด!" then
+        loadButton.Text = "⏳ กำลังโหลด..."
+        loadButton.BackgroundColor3 = Colors.Secondary
+        
+        -- Loop โหลด
+        local progress = 0
+        local steps = {
+            { p = 15, msg = "🔍 กำลังตรวจสอบเกม..." },
+            { p = 30, msg = "📥 กำลังดาวน์โหลด..." },
+            { p = 50, msg = "⚙️ กำลังเตรียม..." },
+            { p = 70, msg = "🔧 กำลังปรับแต่ง..." },
+            { p = 85, msg = "🎯 กำลังติดตั้ง..." },
+            { p = 95, msg = "✨ กำลังปิดท้าย..." },
+            { p = 100, msg = "✅ เสร็จสิ้น!" },
+        }
+        
+        local stepIndex = 1
+        local tween = TweenService:Create(progressBar, TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.None), {
+            Size = UDim2.new(1, 0, 1, 0),
+        })
+        tween:Play()
+        
+        -- อัปเดต progress
+        while progress < 100 do
+            progress = progress + 0.5
+            percentLabel.Text = math.floor(progress) .. "%"
+            
+            if steps[stepIndex] and progress >= steps[stepIndex].p then
+                progressLabel.Text = steps[stepIndex].msg
+                stepIndex = stepIndex + 1
+            end
+            
+            task.wait()
+        end
+        
+        -- เสร็จแล้ว
+        loadButton.Text = "✅ เสร็จแล้ว!"
+        loadButton.BackgroundColor3 = Colors.Success
+        
+        progressLabel.Text = "🎉 โหลดสำเร็จสำหรับผู้ใช้งาน: " .. PLAYER_NAME
+        progressLabel.TextColor3 = Colors.Success
+        
+        -- แจ้งเตือน
+        StarterGui:SetCore("SendNotification", {
+            Title = "✨ " .. APP_NAME .. " ✨",
+            Text = "โหลดสำเสร็จสำหรผู้ใช้งาน: " .. PLAYER_NAME,
+            Duration = 5,
+        })
+        
+        print("====================================================================")
+        print("                    ✅ โหลดสำเสร็จแล้ว!")
+        print("              ผู้ใช้งาน: " .. PLAYER_NAME .. " | เวอร์ชัน: " .. VERSION)
+        print("              พัฒนาโดย: BluezyGPT")
+        print("====================================================================")
+        
+        -- รอหน่อยแล้วปิด
+        task.delay(3, function()
+            loadButton.Text = "🚀 เริ่มใหม่"
+            loadButton.BackgroundColor3 = Colors.Primary
+            progressLabel.Text = "⏳ กำลังเริ่มต้น..."
+            progressLabel.TextColor3 = Colors.TextMuted
+            percentLabel.Text = "0%"
+            progressBar.Size = UDim2.new(0, 0, 1, 0)
+        end)
+    else
+        -- รีเซ็ต
+        loadButton.Text = "🚀 เริ่มโหลด!"
+        loadButton.BackgroundColor3 = Colors.Primary
+        progressLabel.Text = "⏳ กำลังเริ่มต้น..."
+        progressLabel.TextColor3 = Colors.TextMuted
+        percentLabel.Text = "0%"
+        progressBar.Size = UDim2.new(0, 0, 1, 0)
+    end
+end)
+
+-- ปุ่ม About
+local aboutButton = Instance.new("TextButton")
+aboutButton.Name = "AboutButton"
+aboutButton.Size = UDim2.new(1, -30, 0, 35)
+aboutButton.Position = UDim2.new(0, 15, 0, 55)
+aboutButton.BackgroundColor3 = Colors.Secondary
+aboutButton.Text = "ℹ️ เกี่ยวกับ"
+aboutButton.TextColor3 = Colors.TextMuted
+aboutButton.Font = Enum.Font.Gotham
+aboutButton.TextSize = 12
+aboutButton.Parent = buttonsFrame
+
+local aboutCorner = Instance.new("UICorner")
+aboutCorner.CornerRadius = UDim.new(0, 8)
+aboutCorner.Parent = aboutButton
+
+aboutButton.MouseButton1Click:Connect(function()
+    StarterGui:SetCore("SendNotification", {
+        Title = "ℹ️ เกี่ยวกับ",
+        Text = APP_NAME .. " v" .. VERSION .. "\nพัฒนาโดย: " .. CREDITS .. "\nผู้ใช้: " .. PLAYER_NAME,
+        Duration = 5,
+    })
+end)
+
+-- ปุ่ม Exit
+local exitButton = Instance.new("TextButton")
+exitButton.Name = "ExitButton"
+exitButton.Size = UDim2.new(1, -30, 0, 35)
+exitButton.Position = UDim2.new(0, 15, 0, 100)
+exitButton.BackgroundColor3 = Color3.fromHex("#ff4757")
+exitButton.Text = "🚪 ออก"
+exitButton.TextColor3 = Colors.Text
+exitButton.Font = Enum.Font.Gotham
+exitButton.TextSize = 12
+exitButton.Parent = buttonsFrame
+
+local exitCorner = Instance.new("UICorner")
+exitCorner.CornerRadius = UDim.new(0, 8)
+exitCorner.Parent = exitButton
+
+exitButton.MouseButton1Click:Connect(function()
+    mainFrame:Destroy()
+end)
+
+-- =============================================
+-- Footer
+-- =============================================
+local footerLabel = Instance.new("TextLabel")
+footerLabel.Name = "FooterLabel"
+footerLabel.Size = UDim2.new(1, 0, 0, 25)
+footerLabel.Position = UDim2.new(0, 0, 1, -25)
+footerLabel.BackgroundTransparency = 1
+footerLabel.Text = "พัฒนาโดย BluezyGPT | © " .. os.date("%Y")
+footerLabel.TextColor3 = Colors.TextMuted
+footerLabel.Font = Enum.Font.Gotham
+footerLabel.TextSize = 10
+footerLabel.TextXAlignment = Enum.TextXAlignment.Center
+footerLabel.Parent = mainFrame
+
+-- =============================================
+-- Drag System
+-- =============================================
+local dragging = false
+local dragInput = nil
+local dragStart = nil
+local startPos = nil
+
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+titleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- =============================================
+-- Keyboard Shortcut (ESC = ปิด, H = ซ่อน/แสดง)
+-- =============================================
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.Escape then
+        mainFrame:Destroy()
+    elseif input.KeyCode == Enum.KeyCode.H then
+        if mainFrame.Visible then
+            mainFrame.Visible = false
+            StarterGui:SetCore("SendNotification", {
+                Title = "👁️ ซ่อนแล้ว",
+                Text = "กด H อีกครั้งเพื่อแสดง",
+                Duration = 2,
+            })
+        else
+            mainFrame.Visible = true
+            StarterGui:SetCore("SendNotification", {
+                Title = "👁️ แสดงแล้ว",
+                Text = "กด H อีกครั้งเพื่อซ่อน",
+                Duration = 2,
+            })
+        end
+    end
+end)
+
+-- =============================================
+-- Animation ตอนเปิด
+-- =============================================
+mainFrame.BackgroundTransparency = 1
+mainFrame.Size = UDim2.new(0, 350, 0, 300)
+
+local openTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 450, 0, 380),
+    BackgroundTransparency = 0,
 })
+openTween:Play()
 
-local loaderFile
-if data ~= nil and data.no then
-	loaderFile = __def_table
-end
-
-debugLog("กำลั งโหลดไฟลด์ตั วโหลด...")
-loaderFile = loaderFile
-	or timedFunction(
-		function()
-			debugLog("ดรกื ไฟลด์ตั วโหลดจาก URL...")
-			local url = "https://raw.githubusercontent.com/namo/loader/main/loader_core.lua"
-			debugLog("URL ตั วโหลด: " .. url)
-
-			local success, response = pcall(function()
-				return game:HttpGet(url, true)
-			end)
-
-			if not success then
-				debugLog("HTTP GET ล้มเหลว: " .. tostring(response))
-				return nil
-			end
-
-			debugLog("HTTP GET สำเรั จ | ความยาว: " .. tostring(string.len(response)))
-			debugLog("ตั วอย่ างข้อมู ล: " .. string.sub(response, 1, 200) .. "...")
-
-			if response and response ~= "nil" then
-				debugLog("ข้อมู ลถู กตั อง กำลั งบันทึ กไฟลด์...")
-				timedFunction(function()
-					if not isfolder("namo_libs") then
-						makefolder("namo_libs")
-						debugLog("สร้ างโฟลเดอรด์ namo_libs แล้ ว")
-					end
-					writefile("namo_libs/loader_core.lua", response)
-					debugLog("บันทึ ก loader_core.lua เสรั จ")
-				end, 1)
-				debugLog("กำลั ง compile string...")
-				local compiled = loadstring(response)
-				if compiled then
-					debugLog("compile สำเรั จ")
-					return compiled()
-				else
-					debugLog("compile ล้มเหลว!")
-					return nil
-				end
-			else
-				debugLog("คำเตื อน: ข้อมู ลเป็ น nil หรื อค่า 'nil'")
-				return nil
-			end
-		end,
-		5,
-		function(suc, err)
-			debugLog("ผลการโหลดครั้ งแรก: success=" .. tostring(suc) .. ", err=" .. tostring(err))
-			return suc and err
-				or timedFunction(
-					function()
-						debugLog("พยายามโหลดจากไฟลด์สำรอง...")
-						if not isfolder("namo_libs") then
-							makefolder("namo_libs")
-						end
-						if not isfile("namo_libs/loader_core.lua") then
-							debugLog("ผิดพลาด: ใม่ มีไฟลด์ loader_core.lua!")
-							error("ไม่พบไฟลด์ตั วโหลดสำรอง")
-							return
-						end
-						debugLog("อ้ าญไฟลด์ loader_core.lua...")
-						local content = readfile("namo_libs/loader_core.lua")
-						debugLog("อ้ าญเสรั จ ความยาว: " .. tostring(string.len(content)))
-						local compiled = loadstring(content)
-						if compiled then
-							debugLog("โหลดจากไฟลด์สำเรั จ")
-							return compiled()
-						else
-							debugLog("compile จากไฟลด์ล้มเหลว")
-							return nil
-						end
-					end,
-					5,
-					function(suc, err)
-						debugLog("ผลการโหลดสำรอง: success=" .. tostring(suc) .. ", err=" .. tostring(err))
-						return suc and err or __def_table
-					end
-				)
-		end
-	)
-
-debugLog("จั ดการ loaderFile...")
-if loaderFile and type(loaderFile) == "table" and loaderFile.Colors then
-	debugLog("loaderFile ถู กตั อง มีคณุ สมบัตกิ ารสัี")
-else
-	debugLog("คำเตื อน: loaderFile อาจไมถ่ ู กตั อง | Type: " .. type(loaderFile))
-end
-
--- กำหนดสี Gradient สำหรั บ UI
-loaderFile.Colors.Gradient = {
-	ColorSequenceKeypoint.new(0, Color3.fromHex("#00f2ff")),
-	ColorSequenceKeypoint.new(0.5, Color3.fromHex("#7b2fff")),
-	ColorSequenceKeypoint.new(1, Color3.fromHex("#ff00aa")),
-}
-
-local stitle = "นะโม"
-local sicon = nil
-pcall(function()
-	if tostring(shared.NAMO_SCRIPT_TYPE) == "99_NIGHTS_NAMO" then
-		loaderFile.Colors.Gradient = {
-			ColorSequenceKeypoint.new(0, Color3.fromHex("#a855f7")),
-			ColorSequenceKeypoint.new(0.5, Color3.fromHex("#6366f1")),
-			ColorSequenceKeypoint.new(1, Color3.fromHex("#3b82f6")),
-		}
-		stitle = "นะโม Core"
-		sicon = nil
-	end
-end)
-
-debugLog("สร้ าง instance ตั วโหลด...")
-local loader = loaderFile:Loader(sicon)
-shared.ACTIVE_LOADER = loader
-
-loader:Connect(function(res)
-	debugLog("ผลลัพธด์ ้าน loader: " .. tostring(res))
-	shared.ACTIVE_LOADER = nil
-end)
-
-loader:Update("กำลั งเริ่ มต้ง้ ระบบ...", 0)
-loader:Update("กำลั งดึงข้อมู ลเกม...", 10)
-
-if data and data.staging and not shared.NamoDev then
-	debugLog("พบ staging data แต่ไม่ ใช่ม โหมดพั ฒนา กำลั งล้างค่า...")
-	data = nil
-end
-
-if not data then
-	debugLog("ไมร่ อรองรบเก้ นนี้ นะ!")
-	print("ไมร่ อรองรบเก้ นนี้ นะ :c")
-	loader:Abort("ไมร่ อรองรบเก้ นนี้ นะ :c")
-	game:GetService("StarterGui"):SetCore("SendNotification", {
-		Title = stitle .. " | ตั วโหลด",
-		Text = "ไมร่ อรองรบเก้ นนี้ นะ :c",
-		Duration = 15,
-	})
-	return
-else
-	game:GetService("StarterGui"):SetCore("SendNotification", {
-		Title = stitle .. " | ตั วโหลด",
-		Text = "กำลั งโหลดสำหรั บ " .. tostring(data.title) .. "...",
-		Duration = 15,
-	})
-	loader:Update(`กำลั งเตรียมน ${stitle} สำหรั บ ${tostring(data.title)}...`, 40)
-	local res, err
-
-	if shared.NamoDev and data.dev ~= nil and ({ pcall(function()
-		return isfile(data.dev)
-	end) })[2] then
-		debugLog("ใชแ้ ฟลด์ dev: " .. tostring(data.dev))
-		res, err = loadstring(readfile(data.dev))
-	else
-		debugLog("ดุ งสคริปต์จาก URL: " .. tostring(data.script))
-		local success, scriptContent = pcall(function()
-			return game:HttpGet(data.script, true)
-		end)
-
-		debugLog("ผลการดุ งสคริปต์: success=" .. tostring(success))
-		if not success then
-			debugLog("ดุ งสคริปต์ล้มเหลว: " .. tostring(scriptContent))
-		elseif scriptContent == nil or scriptContent == "nil" then
-			debugLog("คำเตื อน: เนื้อหาสคริปต์เป็ น nil!")
-		else
-			debugLog("ดุ งสคริปต์สำเรั จ | ความยาว: " .. tostring(string.len(scriptContent)))
-			debugLog("ตั วอย่ างสคริปต์: " .. string.sub(scriptContent, 1, 500) .. "...")
-		end
-
-		if scriptContent == nil or scriptContent == "nil" then
-			loader:Abort("นะโม ใม่ สามารถเข้ าถึ งไดป้ ะจำภูกุ ภาคของคุ ณ! \n กรุณาใชเ้ VPN แลว้ รันใหม่อีกครั้ ง!")
-			game:GetService("StarterGui"):SetCore("SendNotification", {
-				Title = "นะโม ใม่ รองรบั ในภูกุ ภาคของคุ ณ",
-				Text = "กรุณาเปิ ด VPN แลว้ รัน นะโม ใหม่อีกครั้ ง!",
-				Duration = 15,
-			})
-			return
-		end
-		debugLog("กำลั ง compile สคริปต์หลั ก...")
-		res, err = loadstring(scriptContent)
-		if res then
-			debugLog("compile สำเรั จ | Type: " .. type(res))
-		else
-			debugLog("compile ล้มเหลว! ผิดพลาด: " .. tostring(err))
-		end
-	end
-
-	if type(res) ~= "function" then
-		debugLog("res ไม่ ใชฟ์ ังคชัน้ ! Type: " .. type(res))
-		game:GetService("StarterGui"):SetCore("SendNotification", {
-			Title = stitle .. " | โหลดล้มเหลว",
-			Text = tostring(res),
-			Duration = 15,
-		})
-		print(`โหลดล้มเหลว ${tostring(err)} :c \n กรุณาลองใหม่อีกครั้ ง\n`)
-		loader:Abort(`โหลดล้มเหลว ${tostring(err)} :c \n กรุณาลองใหม่อีกครั้ ง\n`)
-		task.delay(0.5, function()
-			if shared.NamoDev then return end
-			game:GetService("StarterGui"):SetCore("SendNotification", {
-				Title = stitle .. " | รายงานปั ญหา",
-				Text = "กรุณารายงานปั ญหาไปท่ี นะโม \n หรอื เข้ าร่วม Discord หลั ก",
-				Duration = 15,
-			})
-		end)
-	else
-		debugLog("กำลั งรันสคริปต์หลั ก...")
-		loader:Update(`กำลั งโหลด ${stitle}...`, 60)
-		local suc, err = pcall(res)
-		if not suc then
-			debugLog("รันสคริปต์หลั กล้มเหลว: " .. tostring(err))
-			print(`รันหลั กล้มเหลว ${tostring(err)} :c \n กรุณาลองใหม่อีกครั้ ง\n`)
-			loader:Abort(`รันหลั กล้มเหลว ${tostring(err)} :c \n กรุณาลองใหม่อีกครั้ ง\n`)
-			game:GetService("StarterGui"):SetCore("SendNotification", {
-				Title = stitle .. " | ผิดพลาดหลั ก",
-				Text = tostring(err),
-				Duration = 15,
-			})
-			task.delay(0.5, function()
-				if shared.NamoDev then return end
-				game:GetService("StarterGui"):SetCore("SendNotification", {
-					Title = stitle .. " | รายงานปั ญหา",
-					Text = "กรุณารายงานปั ญหาไปท่ี นะโม \n หรอื เข้ าร่วม Discord หลั ก",
-					Duration = 15,
-				})
-			end)
-		else
-			debugLog("รันสคริปต์หลั กสำเรั จ!")
-			loader:Update(`กำลั งปิดระบบ...`, 80)
-			shared.ACTIVE_LOADER = nil
-			loader:Update(`โหลด ${stitle} สำหรั บ ${tostring(data.title)} สำเรั จแลว้ :D`, 100)
-			task.delay(0.5, function()
-				pcall(function()
-					loader:Destroy()
-				end)
-				debugLog("ทำลาย loader เสรั จ")
-			end)
-		end
-	end
-end
-
-debugLog("สคริปต์เสรั จสิ้ น")
+print("====================================================================")
+print("                  ✨ " .. APP_NAME .. " ✨")
+print("               เปิดสำเสร็จแล้ว! ผู้ใช้: " .. PLAYER_NAME)
+print("====================================================================")
